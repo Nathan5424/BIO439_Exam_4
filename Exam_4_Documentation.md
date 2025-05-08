@@ -1,12 +1,18 @@
-# Exam 4 Documentation
+## Exam_4_Documentation
 
-## 1. Data Structures Used to Store k-mers and Their Context
+This short document explains how my script works, how I chose to store the k-mers and their context, how I handled edge cases, and how I made sure everything was counted correctly without duplication.
 
-The main data structure used in this script is a **nested dictionary**. Each k-mer is stored as a key in a dictionary, and its value is another dictionary that holds:
-- The total count of that k-mer (`"count"`)
-- A dictionary (`"next"`) of characters that follow that k-mer, along with how many times each one occurs
+---
 
-Example:
+### 1. How I Stored the K-mers and Context
+
+To keep track of each k-mer and the character that follows it, I used a **nested dictionary** in Python. The outer dictionary uses the k-mer string as the key. Each value is another dictionary with two parts:
+- `"count"`: how many times that exact k-mer shows up in the input sequence
+- `"next"`: a dictionary that stores how many times each base (A, T, G, or C) came directly after the k-mer in the original sequence
+
+This structure makes it easy to look up a k-mer and see both how often it occurs and what tends to come next in the sequence.
+
+#### Example:
 ```python
 {
   "GAA": {
@@ -17,19 +23,25 @@ Example:
 }
 ```
 
-This structure allows fast lookups, avoids duplicate entries, and makes it easy to keep track of both overall and contextual frequencies for each k-mer.
+---
 
-## 2. Handling Edge Cases (e.g., First and Last k-mer in a Sequence)
+### 2. Handling Edge Cases
 
-- **First k-mer**: Treated normally; the loop begins at the first character of the sequence.
-- **Last k-mer**: The loop stops at `len(sequence) - k`, so the final k-mer is only included if it has a character after it. This prevents out-of-range errors and ensures all k-mers included have full context.
-- Edge k-mers are handled safely and consistently by constraining the loop to valid index ranges.
+There were a few edge cases I needed to think about:
+- **First k-mer in a sequence**: This is no different from any other k-mer, so I treated it the same. It's captured naturally as I loop through the sequence.
+- **Last k-mer in a sequence**: The last k-mer might not have a character after it, especially if it's at the end of the file. In this case, I still count the k-mer itself, but I skip updating the `"next"` part since there's no next base to track.
 
-## 3. Avoiding Overcounting or Missing Context
+Also, I made sure to **skip any lines in the file that start with “>”**, since these are FASTA headers, not sequence data.
 
-- The script counts **each k-mer once per valid position** in the sequence.
-- It updates counts using `dict.get()` to safely initialize or increment values without duplication.
-- The loop moves one character at a time to generate overlapping k-mers, ensuring complete coverage.
-- Next characters are only counted if they exist — preventing false context at the end of the sequence.
-- These measures ensure counts are accurate and no context is missed or overstated.
+---
+
+### 3. Avoiding Overcounting or Missing Context
+
+To avoid counting things more than once or skipping over valid k-mers:
+- I read the full sequence into one long string (ignoring the header lines) so that k-mers could span multiple lines if needed.
+- I looped through the sequence one base at a time using a `for` loop and a sliding window of length `k`. This means every overlapping k-mer is considered, as required.
+- For each k-mer, I increment its count and also check if there’s a character right after it. If there is, I update the `"next"` dictionary with that base.
+
+This made sure that I captured every valid k-mer and its context exactly once.
+
 
