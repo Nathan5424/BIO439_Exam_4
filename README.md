@@ -7,8 +7,9 @@ Python Assignment
 This project analyzes a DNA sequence file by identifying all k-mers (substrings of length *k*) and recording:
 - The total frequency of each k-mer
 - The frequency of each character that appears immediately after that k-mer
+- I identified 3 letter k-mers, codons
 
-This information is the basis for computational genome assembly techniques.
+This information is fundamental for computational genome assembly techniques.
 
 The project:
 - Reads raw DNA sequence data from a `.fa` file
@@ -25,10 +26,6 @@ The project:
 - `kmer_analysis_notes.md` – Documentation explaining data structures and edge case handling (see below)
 
 ## Usage
-
-### Requirements
-- Python 3.6+
-- `pytest` (for running tests)
 
 ### Run the Script
 
